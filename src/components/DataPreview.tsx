@@ -5,7 +5,9 @@ import { cn } from './FileUpload';
 interface DataPreviewProps {
   data: any[];
   columns: string[];
-  onStartAnalysis: (column: string, verifiedColumn: string, engagementColumn: string, dateColumn: string, batchSize: number, delayMs: number) => void;
+  onStartAnalysis: (column: string, verifiedColumn: string, engagementColumn: string, dateColumn: string, urlColumn: string, batchSize: number, delayMs: number, apiModel: 'gemini' | 'local') => void;
+  autoDownload: boolean;
+  onAutoDownloadChange: (value: boolean) => void;
 }
 
 const detectColumn = (cols: string[], keywords: string[]) => {
@@ -17,7 +19,7 @@ const detectColumn = (cols: string[], keywords: string[]) => {
   return '';
 };
 
-export function DataPreview({ data, columns, onStartAnalysis }: DataPreviewProps) {
+export function DataPreview({ data, columns, onStartAnalysis, autoDownload, onAutoDownloadChange }: DataPreviewProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   
   const [selectedColumn, setSelectedColumn] = useState<string>(() => {
@@ -44,8 +46,13 @@ export function DataPreview({ data, columns, onStartAnalysis }: DataPreviewProps
     detectColumn(columns, ['date', 'time', 'created', 'timestamp', 'published'])
   );
   
+  const [urlColumn, setUrlColumn] = useState<string>(() => 
+    detectColumn(columns, ['url', 'link', 'href', 'post_link', 'permalink', 'source'])
+  );
+  
   const [batchSize, setBatchSize] = useState<number>(10);
   const [delayMs, setDelayMs] = useState<number>(1000);
+  const [apiModel, setApiModel] = useState<'gemini' | 'local'>('local');
 
   return (
     <div className="w-full bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -198,6 +205,49 @@ export function DataPreview({ data, columns, onStartAnalysis }: DataPreviewProps
               </div>
             </div>
           </div>
+
+          <div className="flex-1">
+            <label htmlFor="url-column-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              URL column (Optional):
+            </label>
+            <div className="relative">
+              <select
+                id="url-column-select"
+                value={urlColumn}
+                onChange={(e) => setUrlColumn(e.target.value)}
+                className="block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-xl border bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm appearance-none"
+              >
+                <option value="">-- None --</option>
+                {columns.map((col, idx) => (
+                  <option key={idx} value={col}>
+                    {idx}: {col}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
+          <div className="flex-1">
+            <label htmlFor="api-model-select" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Select AI Model:
+            </label>
+            <div className="relative">
+              <select
+                id="api-model-select"
+                value={apiModel}
+                onChange={(e) => setApiModel(e.target.value as 'gemini' | 'local')}
+                className="block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-xl border bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm appearance-none"
+              >
+                <option value="gemini">Gemini API (Online)</option>
+                <option value="local">Local Model (CardiffNLP)</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                <ChevronDown className="h-4 w-4" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -229,10 +279,27 @@ export function DataPreview({ data, columns, onStartAnalysis }: DataPreviewProps
               className="block w-full px-3 py-2.5 text-base border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-xl border bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm"
             />
           </div>
+          <div className="flex-1 flex items-center mb-2 sm:mb-0">
+            <label className="flex items-center cursor-pointer group">
+              <div className="relative">
+                <input 
+                  type="checkbox" 
+                  className="sr-only" 
+                  checked={autoDownload}
+                  onChange={(e) => onAutoDownloadChange(e.target.checked)}
+                />
+                <div className={`block w-10 h-6 rounded-full transition-colors ${autoDownload ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-700'}`}></div>
+                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 transform ${autoDownload ? 'translate-x-4' : 'translate-x-0'}`}></div>
+              </div>
+              <div className="ml-3 text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-500 transition-colors">
+                Auto-Download JSON
+              </div>
+            </label>
+          </div>
           
           <div className="flex items-end">
             <button
-              onClick={() => onStartAnalysis(selectedColumn, verifiedColumn, engagementColumn, dateColumn, batchSize, delayMs)}
+              onClick={() => onStartAnalysis(selectedColumn, verifiedColumn, engagementColumn, dateColumn, urlColumn, batchSize, delayMs, apiModel)}
               className="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-xl shadow-sm text-white bg-gradient-to-r from-[#6a11cb] to-[#2575fc] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 focus:ring-offset-slate-900 transition-all w-full sm:w-auto"
             >
               <Play className="w-4 h-4 mr-2" />

@@ -6,7 +6,7 @@ import { FinalResults } from './components/FinalResults';
 import { ComparisonDashboard } from './components/ComparisonDashboard';
 import { SavedProjectsList } from './components/SavedProjectsList';
 import { AnalysisStats, CommentData, ExportedAnalysis, SavedProject } from './types';
-import { analyzeArabicSentimentBatch } from './services/geminiService';
+import { analyzeArabicSentimentBatch, analyzeLocalSentimentBatch } from './services/geminiService';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Folder, Moon, Sun, CheckCircle, X } from 'lucide-react';
@@ -86,6 +86,7 @@ export default function App() {
     }
   });
   const [showSavedProjects, setShowSavedProjects] = useState(false);
+  const [autoDownload, setAutoDownload] = useState(true);
 
   const handleFileUpload = (uploadedFile: File) => {
     setFile(uploadedFile);
@@ -266,7 +267,7 @@ export default function App() {
     });
   };
 
-  const startAnalysis = async (column: string, verifiedColumn: string, engagementColumn: string, dateColumn: string, batchSize: number, delayMs: number, mergeDataArray?: any[]) => {
+  const startAnalysis = async (column: string, verifiedColumn: string, engagementColumn: string, dateColumn: string, urlColumn: string, batchSize: number, delayMs: number, apiModel: 'gemini' | 'local', mergeDataArray?: any[]) => {
     const isMerging = !!mergeDataArray;
     setIsMergingState(isMerging);
     if (!isMerging) {
@@ -282,7 +283,8 @@ export default function App() {
         text: String(row[column] || '').trim(),
         isVerified: verifiedColumn ? String(row[verifiedColumn] || '').toLowerCase() === 'true' || String(row[verifiedColumn] || '') === '1' || String(row[verifiedColumn] || '').toLowerCase() === 'yes' : false,
         engagement: engagementColumn ? parseFloat(row[engagementColumn]) || 0 : 0,
-        date: dateColumn ? String(row[dateColumn] || '') : undefined
+        date: dateColumn ? String(row[dateColumn] || '') : undefined,
+        url: urlColumn ? String(row[urlColumn] || '') : undefined
       }))
       .filter(item => item.text.length > 0);
       
@@ -337,7 +339,9 @@ export default function App() {
       currentStats.currentComment = { id: startIndex + i, text: batchTexts[0] };
       setStats({ ...currentStats });
 
-      const results = await analyzeArabicSentimentBatch(batchTexts);
+      const results = apiModel === 'gemini' 
+        ? await analyzeArabicSentimentBatch(batchTexts)
+        : await analyzeLocalSentimentBatch(batchTexts);
       
       results.forEach((res, idx) => {
         const globalIdx = startIndex + i + idx;
@@ -351,7 +355,8 @@ export default function App() {
           score: res.score,
           isVerified,
           engagement,
-          date
+          date,
+          url: batch[idx].url
         };
         
         allProcessed.push(commentData);
@@ -360,10 +365,10 @@ export default function App() {
         if (isVerified) {
           currentStats.verifiedTotal += 1;
         }
-        if (engagement) {
-          currentStats.totalEngagement += engagement;
+        if (engagement !== undefined && engagement !== null) {
+          currentStats.totalEngagement += Number(engagement) || 0;
         }
-        currentStats.averageEngagement = currentStats.totalEngagement / currentStats.processed;
+        currentStats.averageEngagement = currentStats.processed > 0 ? currentStats.totalEngagement / currentStats.processed : 0;
 
         let mappedScore = 0;
         if (res.sentiment === 'positive') {
@@ -403,12 +408,34 @@ export default function App() {
       setShowSuccessNotification({ message: `Successfully added ${commentsToProcess.length} comments. Total analysis now includes ${currentStats.total} items.` });
       setTimeout(() => setShowSuccessNotification(null), 5000);
     }
+
+    // Auto-download logic
+    if (autoDownload) {
+      const exportData: ExportedAnalysis = {
+          metadata: {
+          columnAnalyzed: isMerging ? columnAnalyzed : column,
+          evaluationTime: currentStats.endTime ? (currentStats.endTime - currentStats.startTime) / 1000 : 0,
+          processingSpeed: currentStats.endTime ? (currentStats.total / ((currentStats.endTime - currentStats.startTime) / 1000)).toFixed(1) : 0,
+          timestamp: new Date().toISOString()
+        },
+        stats: currentStats,
+        comments: allProcessed
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute("href", dataStr);
+      downloadAnchorNode.setAttribute("download", `analysis_${column}_${new Date().getTime()}.json`);
+      document.body.appendChild(downloadAnchorNode);
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    }
   };
 
   const handleCompare = (data: ExportedAnalysis) => {
     setComparisonData(prev => {
       if (prev.length >= 9) {
-        alert("You can compare up to 10 brands at a time (including the current analysis).");
+        alert("You can compare up to 10 brands at a time (including the main brand).");
         return prev;
       }
       return [...prev, data];
@@ -567,6 +594,8 @@ export default function App() {
                   data={data} 
                   columns={columns} 
                   onStartAnalysis={startAnalysis} 
+                  autoDownload={autoDownload}
+                  onAutoDownloadChange={setAutoDownload}
                 />
               </div>
             )}
@@ -598,7 +627,7 @@ export default function App() {
                 onUpdateComments={setProcessedComments}
                 onMergeUpload={handleMergeUpload}
                 onMergeData={(newData) => {
-                  startAnalysis(columnAnalyzed, '', '', '', 20, 1000, newData);
+                  startAnalysis(columnAnalyzed, '', '', '', '', 20, 1000, 'local', newData);
                 }}
               />
             )}
@@ -617,9 +646,9 @@ export default function App() {
                     <DataPreview 
                       data={mergeData} 
                       columns={mergeColumns} 
-                      onStartAnalysis={(col, vCol, eCol, dCol, batch, delay) => {
+                      onStartAnalysis={(col, vCol, eCol, dCol, uCol, batch, delay, apiModel) => {
                         setMergeData(null);
-                        startAnalysis(col, vCol, eCol, dCol, batch, delay, mergeData);
+                        startAnalysis(col, vCol, eCol, dCol, uCol, batch, delay, apiModel, mergeData);
                       }} 
                     />
                   </div>

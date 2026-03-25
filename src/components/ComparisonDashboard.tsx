@@ -5,6 +5,7 @@ import { X, Target, Activity, CheckCircle, BarChart2, FileText, Plus, Eye, EyeOf
 import { CollapsibleChart } from './CollapsibleChart';
 import { UpdateDatesModal } from './UpdateDatesModal';
 import { WordCloudSection } from './WordCloudSection';
+import { CompetitorSentimentChart } from './CompetitorSentimentChart';
 import Papa from 'papaparse';
 
 interface ComparisonDashboardProps {
@@ -58,6 +59,8 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
   const [selectedComments, setSelectedComments] = useState<{ title: string, comments: CommentData[] } | null>(null);
   const [localOverrides, setLocalOverrides] = useState<Record<number, ExportedAnalysis>>({});
   const [updatingBrandIndex, setUpdatingBrandIndex] = useState<number | null>(null);
+  const [customBrandNames, setCustomBrandNames] = useState<Record<number, string>>({});
+  const [editingBrandIndex, setEditingBrandIndex] = useState<number | null>(null);
 
   const allBrands = [currentBrand, ...comparedBrands].map((b, i) => localOverrides[i] || b);
   
@@ -76,7 +79,8 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
   const visibleBrands = allBrands.map((brand, index) => ({ brand, index })).filter(b => !hiddenBrands.has(b.index));
   
   const getBrandName = (brand: ExportedAnalysis, index: number) => {
-    if (index === 0) return "Current Analysis";
+    if (customBrandNames[index]) return customBrandNames[index];
+    if (index === 0) return "Main Brand";
     const colName = brand.metadata.columnAnalyzed || 'Unknown';
     return `Brand ${index} (${colName})`;
   };
@@ -378,14 +382,41 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
               }`}
               style={!isHidden ? { borderLeftColor: color, borderLeftWidth: '4px' } : {}}
             >
-              <button 
-                onClick={() => toggleBrandVisibility(idx)} 
-                className="flex items-center mr-2 hover:opacity-80 transition-opacity"
-                title={isHidden ? "Show Brand" : "Hide Brand"}
-              >
-                {isHidden ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" style={{ color }} />}
-                {getBrandName(brand, idx)}
-              </button>
+              {editingBrandIndex === idx ? (
+                <input
+                  autoFocus
+                  className="bg-slate-100 dark:bg-slate-700 border-none rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none w-32"
+                  defaultValue={getBrandName(brand, idx)}
+                  onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                    const newName = e.target.value.trim();
+                    if (newName) {
+                      setCustomBrandNames(prev => ({ ...prev, [idx]: newName }));
+                    }
+                    setEditingBrandIndex(null);
+                  }}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                    if (e.key === 'Enter') {
+                      const newName = e.currentTarget.value.trim();
+                      if (newName) {
+                        setCustomBrandNames(prev => ({ ...prev, [idx]: newName }));
+                      }
+                      setEditingBrandIndex(null);
+                    } else if (e.key === 'Escape') {
+                      setEditingBrandIndex(null);
+                    }
+                  }}
+                />
+              ) : (
+                <button 
+                  onClick={() => toggleBrandVisibility(idx)} 
+                  onDoubleClick={() => setEditingBrandIndex(idx)}
+                  className="flex items-center mr-2 hover:opacity-80 transition-opacity"
+                  title={isHidden ? "Show Brand (Double click to rename)" : "Hide Brand (Double click to rename)"}
+                >
+                  {isHidden ? <EyeOff className="w-4 h-4 mr-1.5" /> : <Eye className="w-4 h-4 mr-1.5" style={{ color }} />}
+                  {getBrandName(brand, idx)}
+                </button>
+              )}
               
               {!isHidden && (
                 <>
@@ -545,6 +576,18 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
           </div>
         </div>
 
+        <div className="lg:col-span-2">
+          <CompetitorSentimentChart 
+            brands={allBrands.map((brand, idx) => ({
+              name: getBrandName(brand, idx),
+              positive: brand.stats.positive,
+              negative: brand.stats.negative,
+              neutral: brand.stats.neutral,
+              color: BRAND_COLORS[idx % BRAND_COLORS.length]
+            }))} 
+          />
+        </div>
+
         {/* Collapsible Charts */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
@@ -630,17 +673,14 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
             dataKeys={visibleBrands.map(({ brand, index }) => `${getBrandName(brand, index)}_impressions`)}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeSeriesData} onClick={(data) => {
-                if (data && data.activePayload) {
-                  const payload = data.activePayload[0].payload;
-                  if (payload.comments) {
-                    const allComments = Object.values(payload.comments).flat() as CommentData[];
-                    if (allComments.length > 0) {
-                      setSelectedComments({ title: `Impressions in ${payload.period}`, comments: allComments });
+                <LineChart data={timeSeriesData} onClick={(data: any) => {
+                  if (data && data.activePayload) {
+                    const payload = data.activePayload[0].payload;
+                    if (payload.comments && payload.comments.length > 0) {
+                      setSelectedComments({ title: `Impressions in ${payload.period}`, comments: payload.comments });
                     }
                   }
-                }
-              }} style={{ cursor: 'pointer' }}>
+                }} style={{ cursor: 'pointer' }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--tooltip-border, #e2e8f0)" />
                 <XAxis dataKey="period" tick={{fill: '#64748b', fontSize: 12}} tickLine={false} axisLine={false} />
                 <YAxis tick={{fill: '#64748b', fontSize: 12}} tickLine={false} axisLine={false} label={{ value: 'Potential Impressions', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 12, offset: 0 }} />
@@ -677,17 +717,14 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
             dataKeys={visibleBrands.map(({ brand, index }) => `${getBrandName(brand, index)}_engagement`)}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeSeriesData} onClick={(data) => {
-                if (data && data.activePayload) {
-                  const payload = data.activePayload[0].payload;
-                  if (payload.comments) {
-                    const allComments = Object.values(payload.comments).flat() as CommentData[];
-                    if (allComments.length > 0) {
-                      setSelectedComments({ title: `Engagement in ${payload.period}`, comments: allComments });
+                <LineChart data={timeSeriesData} onClick={(data: any) => {
+                  if (data && data.activePayload) {
+                    const payload = data.activePayload[0].payload;
+                    if (payload.comments && payload.comments.length > 0) {
+                      setSelectedComments({ title: `Engagement in ${payload.period}`, comments: payload.comments });
                     }
                   }
-                }
-              }} style={{ cursor: 'pointer' }}>
+                }} style={{ cursor: 'pointer' }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--tooltip-border, #e2e8f0)" />
                 <XAxis dataKey="period" tick={{fill: '#64748b', fontSize: 12}} tickLine={false} axisLine={false} />
                 <YAxis tick={{fill: '#64748b', fontSize: 12}} tickLine={false} axisLine={false} label={{ value: 'Total Engagement', angle: -90, position: 'insideLeft', fill: '#64748b', fontSize: 12, offset: 0 }} />

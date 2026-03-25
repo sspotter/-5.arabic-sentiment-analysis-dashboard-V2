@@ -7,6 +7,8 @@ import { ExportedAnalysis } from '../types';
 import { CollapsibleChart } from './CollapsibleChart';
 import { UpdateDatesModal } from './UpdateDatesModal';
 import { WordCloudSection } from './WordCloudSection';
+import { SentimentTrendChart } from './SentimentTrendChart';
+import { CompetitorSentimentChart } from './CompetitorSentimentChart';
 
 interface FinalResultsProps {
   stats: AnalysisStats;
@@ -462,16 +464,16 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Overview</h3>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+              <span className="text-slate-500 dark:text-slate-400 flex items-center"><FileText className="w-4 h-4 mr-2"/> Column Analyzed</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 px-2 py-1 rounded text-xs">{columnAnalyzed}</span>
+            </div>
+            <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><FileText className="w-4 h-4 mr-2"/> Total Comments</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.total}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><CheckCircle className="w-4 h-4 mr-2"/> Verified Users</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.verifiedTotal}</span>
-            </div>
-            <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center"><FileText className="w-4 h-4 mr-2"/> Column Analyzed</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 px-2 py-1 rounded text-xs">{columnAnalyzed}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><Target className="w-4 h-4 mr-2"/> Brand Sentiment</span>
@@ -483,16 +485,16 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><BarChart2 className="w-4 h-4 mr-2"/> Avg Engagement</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.averageEngagement.toFixed(1)} / 10</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.averageEngagement.toFixed(1)}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><BarChart2 className="w-4 h-4 mr-2"/> Total Engagement</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.totalEngagement.toFixed(0)}</span>
             </div>
-            <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+            {/* <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-emerald-400"/> Total Positive Score</span>
               <span className="font-semibold text-emerald-400">{stats.positive} ({stats.total > 0 ? ((stats.positive / stats.total) * 100).toFixed(1) : 0}%)</span>
-            </div>
+            </div> */}
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><Clock className="w-4 h-4 mr-2"/> Evaluation Time</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">{evaluationTime.toFixed(2)} s</span>
@@ -602,54 +604,27 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
         {/* Right Column: Line Chart & Data Table */}
         <div className="space-y-6 lg:col-span-2">
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Sentiment Trend Over Time</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={lineData} onClick={(data) => {
-                  if (data && data.activePayload) {
-                    const idx = data.activePayload[0].payload.index;
-                    if (processedComments[idx]) {
-                      setSelectedComments({ title: 'Comment Details', comments: [processedComments[idx]] });
-                    }
-                  }
-                }} style={{ cursor: 'pointer' }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--tooltip-border, #e2e8f0)" />
-                  <XAxis dataKey="index" tick={{fill: '#64748b', fontSize: 12}} tickLine={false} axisLine={false} />
-                  <YAxis 
-                    domain={[-100, 100]} 
-                    ticks={[-100, 0, 100]}
-                    tickFormatter={(value) => {
-                      if (value === 100) return '😊';
-                      if (value === 0) return '😐';
-                      if (value === -100) return '😞';
-                      return '';
-                    }}
-                    tick={{fill: '#64748b', fontSize: 20}} 
-                    tickLine={false} 
-                    axisLine={false} 
-                    width={40}
-                  />
-                  <Tooltip 
-                    content={<CustomTooltip />} 
-                    wrapperStyle={{ pointerEvents: 'auto' }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    stroke="#6366f1" 
-                    strokeWidth={3}
-                    dot={false}
-                    activeDot={{ 
-                      r: 6, 
-                      fill: '#6366f1', 
-                      stroke: '#fff', 
-                      strokeWidth: 2
-                    }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+            <div className="w-full">
+               <SentimentTrendChart 
+                comments={processedComments} 
+                onPointClick={(comment) => {
+                  setSelectedComments({ title: 'Comment Details', comments: [comment] });
+                }}
+               />
             </div>
           </div>
+
+          <CompetitorSentimentChart 
+            brands={[
+              {
+                name: "Main Brand",
+                positive: stats.positive,
+                negative: stats.negative,
+                neutral: stats.neutral,
+                color: "#6366f1"
+              }
+            ]} 
+          />
 
           {/* Collapsible Charts */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
@@ -688,7 +663,7 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
             dataKeys={['posts']}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeSeriesData} onClick={(data) => {
+              <LineChart data={timeSeriesData} onClick={(data: any) => {
                 if (data && data.activePayload) {
                   const payload = data.activePayload[0].payload;
                   if (payload.comments && payload.comments.length > 0) {
@@ -715,7 +690,7 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
             dataKeys={['impressions']}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeSeriesData} onClick={(data) => {
+              <LineChart data={timeSeriesData} onClick={(data: any) => {
                 if (data && data.activePayload) {
                   const payload = data.activePayload[0].payload;
                   if (payload.comments && payload.comments.length > 0) {
@@ -742,7 +717,7 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
             dataKeys={['engagement']}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={timeSeriesData} onClick={(data) => {
+              <LineChart data={timeSeriesData} onClick={(data: any) => {
                 if (data && data.activePayload) {
                   const payload = data.activePayload[0].payload;
                   if (payload.comments && payload.comments.length > 0) {
@@ -1098,6 +1073,25 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
                       <div>
                         <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Engagement</span>
                         <p className="mt-1 text-sm text-slate-800 dark:text-slate-200">{comment.engagement}</p>
+                      </div>
+                    )}
+                    {comment.url && (
+                      <div className="col-span-2 sm:col-span-4 pt-2 border-t border-slate-100 dark:border-slate-800/50">
+                        <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center">
+                          Post URL
+                          <svg className="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </span>
+                        <a 
+                          href={comment.url.startsWith('http') ? comment.url : `https://${comment.url}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="mt-1 block text-sm text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium truncate transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {comment.url}
+                        </a>
                       </div>
                     )}
                   </div>

@@ -1,0 +1,5 @@
+export 
+
+sentiment emoji on the left
+lets have a button while analyizing to pause the analyization 
+in case there is an api error the analyizing will pause until user continue the analyization again

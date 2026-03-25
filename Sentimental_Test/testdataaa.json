@@ -1,0 +1,159 @@
+{
+  "metadata": {
+    "columnAnalyzed": "Comment Text",
+    "evaluationTime": 9.84,
+    "processingSpeed": "1.5",
+    "timestamp": "2026-03-22T18:42:11.214Z"
+  },
+  "stats": {
+    "total": 12,
+    "processed": 12,
+    "positive": 7,
+    "negative": 3,
+    "neutral": 2,
+    "verifiedTotal": 4,
+    "verifiedPositive": 3,
+    "verifiedNegative": 1,
+    "verifiedNeutral": 0,
+    "totalEngagement": 8450,
+    "averageEngagement": 704,
+    "currentScore": 58,
+    "scoreHistory": [
+      60,
+      65,
+      62,
+      58,
+      55,
+      57,
+      59,
+      61,
+      60,
+      58,
+      57,
+      58
+    ],
+    "startTime": 1774556000000,
+    "currentComment": {
+      "id": 12,
+      "text": "Not bad 👍",
+      "sentiment": "neutral",
+      "score": 0.5,
+      "isVerified": false,
+      "engagement": 120,
+      "date": "3/22/2026, 6:40:02 PM"
+    },
+    "endTime": 1774556009840,
+    "brandSentiment": 58,
+    "netSentimentScore": 50
+  },
+  "comments": [
+    {
+      "id": 1,
+      "text": "Amazing work 🔥",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": true,
+      "engagement": 1200,
+      "date": "3/20/2026, 10:15:22 AM"
+    },
+    {
+      "id": 2,
+      "text": "I love this 😍",
+      "sentiment": "positive",
+      "score": 0.88,
+      "isVerified": false,
+      "engagement": 980,
+      "date": "3/20/2026, 11:02:11 AM"
+    },
+    {
+      "id": 3,
+      "text": "Could be better",
+      "sentiment": "neutral",
+      "score": 0.5,
+      "isVerified": false,
+      "engagement": 300,
+      "date": "3/20/2026, 12:45:09 PM"
+    },
+    {
+      "id": 4,
+      "text": "Not impressed 😕",
+      "sentiment": "negative",
+      "score": 0.3,
+      "isVerified": true,
+      "engagement": 450,
+      "date": "3/20/2026, 1:18:44 PM"
+    },
+    {
+      "id": 5,
+      "text": "😂😂😂",
+      "sentiment": "positive",
+      "score": 0.7,
+      "isVerified": false,
+      "engagement": 760,
+      "date": "3/21/2026, 9:33:01 AM"
+    },
+    {
+      "id": 6,
+      "text": "This is terrible",
+      "sentiment": "negative",
+      "score": 0.2,
+      "isVerified": false,
+      "engagement": 520,
+      "date": "3/21/2026, 10:12:55 AM"
+    },
+    {
+      "id": 7,
+      "text": "Wow 🤩",
+      "sentiment": "positive",
+      "score": 0.85,
+      "isVerified": true,
+      "engagement": 1340,
+      "date": "3/21/2026, 11:44:33 AM"
+    },
+    {
+      "id": 8,
+      "text": "meh",
+      "sentiment": "neutral",
+      "score": 0.4,
+      "isVerified": false,
+      "engagement": 210,
+      "date": "3/21/2026, 12:01:17 PM"
+    },
+    {
+      "id": 9,
+      "text": "Absolutely loved it ❤️",
+      "sentiment": "positive",
+      "score": 0.92,
+      "isVerified": true,
+      "engagement": 1800,
+      "date": "3/21/2026, 1:22:40 PM"
+    },
+    {
+      "id": 10,
+      "text": "Worst experience ever",
+      "sentiment": "negative",
+      "score": 0.1,
+      "isVerified": false,
+      "engagement": 600,
+      "date": "3/21/2026, 2:10:05 PM"
+    },
+    {
+      "id": 11,
+      "text": "Nice 👍",
+      "sentiment": "positive",
+      "score": 0.75,
+      "isVerified": false,
+      "engagement": 450,
+      "date": "3/22/2026, 4:55:18 PM"
+    },
+    {
+      "id": 12,
+      "text": "Not bad 👍",
+      "sentiment": "neutral",
+      "score": 0.5,
+      "isVerified": false,
+      "engagement": 120,
+      "date": "3/22/2026, 6:40:02 PM"
+    }
+  ]
+}

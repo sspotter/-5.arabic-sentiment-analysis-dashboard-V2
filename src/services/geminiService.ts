@@ -9,6 +9,11 @@ Comments:
 ${comments.map((c, i) => `${i}: ${c}`).join('\n')}
 `;
 
+  console.log("=== SENDING REQUEST TO GEMINI MODEL ===");
+  console.log("Model: gemini-3-flash-preview");
+  console.log("Prompt payload:", prompt);
+  console.log("=======================================");
+
   try {
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -34,7 +39,38 @@ ${comments.map((c, i) => `${i}: ${c}`).join('\n')}
     }
     return comments.map(() => ({ sentiment: 'neutral', score: 0 }));
   } catch (error) {
-    console.error("Error analyzing sentiment:", error);
+    console.error("Error analyzing sentiment with Gemini:", error);
+    // Fallback to neutral on error
+    return comments.map(() => ({ sentiment: 'neutral', score: 0 }));
+  }
+}
+
+export async function analyzeLocalSentimentBatch(comments: string[]): Promise<{ sentiment: 'positive' | 'negative' | 'neutral', score: number }[]> {
+  const payload = { comments };
+
+  console.log("=== SENDING REQUEST TO LOCAL MODEL ===");
+  console.log("Endpoint: http://localhost:8555/analyze");
+  
+  console.log("Payload:", JSON.stringify(payload, null, 2));
+  console.log("======================================");
+
+  try {
+    const response = await fetch('http://localhost:8555/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Local API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error analyzing sentiment with Local API:", error);
     // Fallback to neutral on error
     return comments.map(() => ({ sentiment: 'neutral', score: 0 }));
   }

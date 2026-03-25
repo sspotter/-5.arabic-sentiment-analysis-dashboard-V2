@@ -6,6 +6,7 @@ export interface CommentData {
   isVerified?: boolean;
   engagement?: number;
   date?: string;
+  url?: string;
 }
 
 export interface AnalysisStats {
