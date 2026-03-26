@@ -129,18 +129,7 @@ app.get('/', (req, res) => {
         type: 'datetime',
         gridLineWidth: 1,
         gridLineColor: 'rgba(255,255,255,0.05)',
-  labels: {
-    style: { color: '#94a3b8' },
-    formatter: function () {
-      return Highcharts.dateFormat('%b', this.value); // ONLY "Feb"
-    }
-  },
-  dateTimeLabelFormats: {
-    day: '%b',
-    week: '%b',
-    month: '%b',
-    year: '%b'
-  }
+        labels: { style: { color: '#94a3b8' } }
       },
       yAxis: {
         opposite: false,
@@ -218,5 +207,5 @@ app.listen(port, () => {
   console.log("🚀 Test server running at http://localhost:\${port}", port);
 
 });
-
+  
 

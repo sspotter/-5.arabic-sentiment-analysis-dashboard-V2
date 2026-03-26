@@ -146,7 +146,7 @@ export function AnalysisProgress({
           textColor="text-amber-400"
         />
         <MetricCard
-          title="Sentimental Score"
+          title="Sentiment Score"
           value={stats.currentScore.toFixed(3)}
           icon={<TrendingUp className="w-6 h-6 text-purple-400" />}
           bgColor="bg-purple-500/10"

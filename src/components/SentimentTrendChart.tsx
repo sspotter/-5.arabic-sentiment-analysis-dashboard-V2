@@ -143,8 +143,19 @@ export function SentimentTrendChart({ comments, onPointClick }: SentimentTrendCh
       type: 'datetime',
       gridLineWidth: 1,
       gridLineColor: gridLineColor,
-      labels: { style: { color: subTextColor } }
-    },
+  labels: {
+    style: { color: '#94a3b8' },
+    formatter: function () {
+      return Highcharts.dateFormat('%b', this.value); // ONLY "Feb"
+    }
+  },
+  dateTimeLabelFormats: {
+    day: '%b',
+    week: '%b',
+    month: '%b',
+    year: '%b'
+  }
+      },
     yAxis: {
       opposite: false,
       title: { text: null },
