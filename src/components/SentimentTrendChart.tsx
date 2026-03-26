@@ -148,8 +148,7 @@ export function SentimentTrendChart({ comments, onPointClick }: SentimentTrendCh
     yAxis: {
       opposite: false,
       title: { text: null },
-      min: -1.5,
-      max: 1.5,
+      min: -1.2, max: 1.2, tickPositions: [-1, 0, 1],
       gridLineColor: gridLineColor,
       labels: {
         style: { color: subTextColor, fontSize: '12px' },

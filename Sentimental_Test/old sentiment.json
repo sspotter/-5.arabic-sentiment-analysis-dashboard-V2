@@ -1,0 +1,259 @@
+{
+  "metadata": {
+    "columnAnalyzed": "Comment Text",
+    "evaluationTime": 17.459,
+    "processingSpeed": "1.3",
+    "timestamp": "2026-03-25T08:20:30.717Z"
+  },
+  "stats": {
+    "total": 22,
+    "processed": 22,
+    "positive": 14,
+    "negative": 3,
+    "neutral": 5,
+    "verifiedTotal": 5,
+    "verifiedPositive": 5,
+    "verifiedNegative": 0,
+    "verifiedNeutral": 0,
+    "totalEngagement": 5487,
+    "averageEngagement": 249.4090909090909,
+    "currentScore": 50,
+    "scoreHistory": [
+      100,
+      100,
+      0,
+      0,
+      0,
+      0,
+      0,
+      -100,
+      100,
+      100,
+      -100,
+      100,
+      -100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100,
+      100
+    ],
+    "startTime": 1774329591909,
+    "currentComment": {
+      "id": 22,
+      "text": "طيب عيب عليكم صرت صارف حق50علبه ولهلق مابتعطوني جائزه🤣🤣🤣♥️",
+      "sentiment": "positive",
+      "score": 0.5,
+      "isVerified": false,
+      "engagement": 67,
+      "date": "2026-02-17T12:53:29.000Z"
+    },
+    "endTime": 1774329609368,
+    "brandSentiment": 82.35294117647058,
+    "netSentimentScore": 50
+  },
+  "comments": [
+    {
+      "id": 1,
+      "text": "ولله راني شي اصطوري بسوريا معبيا الدنيا❤️",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 2,
+      "text": "أنت الأصطوري 🧡",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": true,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 3,
+      "text": "@_0valerius0_ عجن الخواطر😂😂",
+      "sentiment": "neutral",
+      "score": 0.3,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 4,
+      "text": "8 wt ho",
+      "sentiment": "neutral",
+      "score": 0,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 5,
+      "text": "هت كرتون",
+      "sentiment": "neutral",
+      "score": 0,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 6,
+      "text": "ضيفو مؤترات صوتية زيادة",
+      "sentiment": "neutral",
+      "score": 0.1,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 7,
+      "text": "برأيي خليكم بعيدين عن الأغاني",
+      "sentiment": "neutral",
+      "score": -0.2,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 8,
+      "text": "غيروا اسمكم مو حلو راني",
+      "sentiment": "negative",
+      "score": -0.6,
+      "isVerified": false,
+      "engagement": 525,
+      "date": "2026-03-10T18:00:42.000Z"
+    },
+    {
+      "id": 9,
+      "text": "محمد في رمضان هههههههههههه",
+      "sentiment": "positive",
+      "score": 0.5,
+      "isVerified": false,
+      "engagement": 72,
+      "date": "2026-02-27T19:30:00.000Z"
+    },
+    {
+      "id": 10,
+      "text": "بالضبط 🤣🧡",
+      "sentiment": "positive",
+      "score": 0.7,
+      "isVerified": true,
+      "engagement": 72,
+      "date": "2026-02-27T19:30:00.000Z"
+    },
+    {
+      "id": 11,
+      "text": "مقاطعة",
+      "sentiment": "negative",
+      "score": -0.7,
+      "isVerified": false,
+      "engagement": 72,
+      "date": "2026-02-27T19:30:00.000Z"
+    },
+    {
+      "id": 12,
+      "text": "🫂🧡",
+      "sentiment": "positive",
+      "score": 0.8,
+      "isVerified": true,
+      "engagement": 115,
+      "date": "2026-02-26T15:30:00.000Z"
+    },
+    {
+      "id": 13,
+      "text": "مقاطعة",
+      "sentiment": "negative",
+      "score": -0.7,
+      "isVerified": false,
+      "engagement": 115,
+      "date": "2026-02-26T15:30:00.000Z"
+    },
+    {
+      "id": 14,
+      "text": "شركتي ❤️",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": false,
+      "engagement": 115,
+      "date": "2026-02-26T15:30:00.000Z"
+    },
+    {
+      "id": 15,
+      "text": "رهيب ههههههههههههههههههههههههههههههههههههههه",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": false,
+      "engagement": 115,
+      "date": "2026-02-26T15:30:00.000Z"
+    },
+    {
+      "id": 16,
+      "text": "رهيييب",
+      "sentiment": "positive",
+      "score": 0.8,
+      "isVerified": false,
+      "engagement": 111,
+      "date": "2026-02-21T18:00:36.000Z"
+    },
+    {
+      "id": 17,
+      "text": "أنت الرهيب 🧡",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": true,
+      "engagement": 111,
+      "date": "2026-02-21T18:00:36.000Z"
+    },
+    {
+      "id": 18,
+      "text": "🧡🫂",
+      "sentiment": "positive",
+      "score": 0.8,
+      "isVerified": true,
+      "engagement": 111,
+      "date": "2026-02-21T18:00:36.000Z"
+    },
+    {
+      "id": 19,
+      "text": "Wooooow👏🏾💥💓",
+      "sentiment": "positive",
+      "score": 0.9,
+      "isVerified": false,
+      "engagement": 111,
+      "date": "2026-02-21T18:00:36.000Z"
+    },
+    {
+      "id": 20,
+      "text": "العصير يلي اتفق الشعب العربي على جودتو ❤️🔥",
+      "sentiment": "positive",
+      "score": 1,
+      "isVerified": false,
+      "engagement": 50,
+      "date": "2026-02-21T13:59:42.000Z"
+    },
+    {
+      "id": 21,
+      "text": "ههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههه ههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههه",
+      "sentiment": "positive",
+      "score": 0.8,
+      "isVerified": false,
+      "engagement": 50,
+      "date": "2026-02-21T13:59:42.000Z"
+    },
+    {
+      "id": 22,
+      "text": "طيب عيب عليكم صرت صارف حق50علبه ولهلق مابتعطوني جائزه🤣🤣🤣♥️",
+      "sentiment": "positive",
+      "score": 0.5,
+      "isVerified": false,
+      "engagement": 67,
+      "date": "2026-02-17T12:53:29.000Z"
+    }
+  ]
+}

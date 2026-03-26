@@ -3,6 +3,7 @@ import { AnalysisStats } from '../types';
 
 interface BrandSentimentData {
   name: string;
+  displayName?: React.ReactNode;
   positive: number;
   negative: number;
   neutral: number;
@@ -15,6 +16,11 @@ interface CompetitorSentimentChartProps {
 }
 
 export function CompetitorSentimentChart({ brands, title = "Sentiment, by Competitor" }: CompetitorSentimentChartProps) {
+  const rawName = brands.length === 1 ? brands[0].name : '';
+  const displayTitle = brands.length === 1 
+    ? (rawName === "Main Brand" || !rawName ? "Sentiment for Brand" : `Sentiment for ${rawName}`)
+    : title;
+
   return (
     <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm animate-in fade-in duration-700">
       <div className="overflow-x-auto">
@@ -22,14 +28,14 @@ export function CompetitorSentimentChart({ brands, title = "Sentiment, by Compet
           <thead>
             <tr className="border-b border-slate-100 dark:border-slate-800">
               <th className="pb-4 text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans uppercase tracking-wider w-1/4">
-                {title}
+                {displayTitle}
               </th>
               <th className="pb-4 text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans uppercase tracking-wider text-center px-4">
-                Sentiment Comparison
+                Sentiment
               </th>
-              <th className="pb-4 text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans uppercase tracking-wider text-right px-4">
+              {/* <th className="pb-4 text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans uppercase tracking-wider text-right px-4">
                 Comments
-              </th>
+              </th> */}
               <th className="pb-4 text-xs font-semibold text-slate-500 dark:text-slate-400 font-sans uppercase tracking-wider text-right px-4">
                 Net Score
               </th>
@@ -76,7 +82,7 @@ export function CompetitorSentimentChart({ brands, title = "Sentiment, by Compet
                         style={{ backgroundColor: brandColor }}
                       />
                       <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-                        {brand.name}
+                        {brand.displayName || brand.name}
                       </span>
                     </div>
                   </td>
@@ -96,11 +102,13 @@ export function CompetitorSentimentChart({ brands, title = "Sentiment, by Compet
                       />
                     </div>
                   </td>
-                  <td className="py-5 px-4 text-right">
+
+                  {/*Comments total count*/}
+                  {/* <td className="py-5 px-4 text-right">
                     <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">
                       {totalCount.toLocaleString()}
                     </span>
-                  </td>
+                  </td> */}
                   <td className="py-5 px-4 text-right">
                     <span className={`text-sm font-bold ${netScore >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                       {netScore}
@@ -132,10 +140,10 @@ export function CompetitorSentimentChart({ brands, title = "Sentiment, by Compet
           <div className="w-3 h-3 rounded bg-rose-500" />
           <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Negative</span>
         </div>
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <div className="w-3 h-3 rounded bg-amber-500" />
-          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Neutral</span>
-        </div>
+          <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">NDSFSDFSDeutral</span>
+        </div> */}
       </div>
     </div>
   );

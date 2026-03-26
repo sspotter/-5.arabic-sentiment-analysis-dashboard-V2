@@ -13,6 +13,8 @@ import { CompetitorSentimentChart } from './CompetitorSentimentChart';
 interface FinalResultsProps {
   stats: AnalysisStats;
   columnAnalyzed: string;
+  brandName: string;
+  onBrandNameUpdate?: (newName: string) => void;
   processedComments: CommentData[];
   onCompare?: (data: ExportedAnalysis) => void;
   onReset?: () => void;
@@ -47,32 +49,47 @@ const formatDateKey = (d: Date, timeframe: 'daily' | 'weekly' | 'monthly') => {
   return `${d.getDate().toString().padStart(2, '0')} ${d.toLocaleString('default', { month: 'short' })}`;
 };
 
-export function FinalResults({ stats, columnAnalyzed, processedComments, onCompare, onReset, onSave, onUpdateComments, onMergeUpload, onMergeData }: FinalResultsProps) {
+export function FinalResults({ 
+  stats, 
+  columnAnalyzed, 
+  brandName,
+  onBrandNameUpdate,
+  processedComments, 
+  onCompare, 
+  onReset, 
+  onSave, 
+  onUpdateComments, 
+  onMergeUpload, 
+  onMergeData 
+}: FinalResultsProps) {
   const [showVerifiedChart, setShowVerifiedChart] = useState(false);
   const [showVerifiedTable, setShowVerifiedTable] = useState(false);
   const [showUpdateDatesModal, setShowUpdateDatesModal] = useState(false);
   const [showAddCommentsModal, setShowAddCommentsModal] = useState(false);
   const [manualCommentsText, setManualCommentsText] = useState('');
-  
+  const [selectedComments, setSelectedComments] = useState<{ title: string, comments: CommentData[] } | null>(null);
+  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
+  const [comparisonMode, setComparisonMode] = useState<'absolute' | 'percentage'>('absolute');
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveProjectName, setSaveProjectName] = useState(`Analysis - ${columnAnalyzed}`);
+  const [isEditingBrand, setIsEditingBrand] = useState(false);
+  const [editingBrandValue, setEditingBrandValue] = useState(brandName);
+
   // Filtering state
   const [verifiedFilter, setVerifiedFilter] = useState<'all' | 'verified' | 'unverified'>('all');
   const [sentimentFilter, setSentimentFilter] = useState<string[]>([]);
   const [searchFilter, setSearchFilter] = useState('');
   const [scoreFilter, setScoreFilter] = useState<number | ''>('');
 
-  const [showSaveModal, setShowSaveModal] = useState(false);
-  const [saveProjectName, setSaveProjectName] = useState(`Analysis - ${columnAnalyzed}`);
-  const [selectedComments, setSelectedComments] = useState<{ title: string, comments: CommentData[] } | null>(null);
-  
-  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('monthly');
-  const [comparisonMode, setComparisonMode] = useState<'absolute' | 'percentage'>('absolute');
-
   const evaluationTime = stats.endTime ? (stats.endTime - stats.startTime) / 1000 : 0;
   const processingSpeed = evaluationTime > 0 ? (stats.total / evaluationTime).toFixed(1) : 0;
 
   const posNegTotal = stats.positive + stats.negative;
   const brandSentiment = posNegTotal > 0 ? (stats.positive / posNegTotal) * 100 : 0;
-  const netSentimentScore = stats.total > 0 ? ((stats.positive - stats.negative) / stats.total) * 100 : 0;
+  const netSentimentScoreBrand = stats.total > 0 ? ((stats.positive - stats.negative) / stats.total) * 100 : 0;
+  const netSentimentScore =posNegTotal > 0
+  ? ((stats.positive - stats.negative) / posNegTotal) * 100
+  : 0;;
 
   const pieData = [
     { name: 'Positive', value: stats.positive },
@@ -231,6 +248,7 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
     const exportData = {
       metadata: {
         columnAnalyzed,
+        brandName,
         evaluationTime,
         processingSpeed,
         timestamp: new Date().toISOString()
@@ -247,7 +265,7 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `sentiment_analysis_${columnAnalyzed}.json`);
+    link.setAttribute('download', `sentiment_analysis_${brandName || columnAnalyzed}.json`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -259,6 +277,7 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
       const exportData = {
         metadata: {
           columnAnalyzed,
+          brandName,
           evaluationTime,
           processingSpeed,
           timestamp: new Date().toISOString()
@@ -463,12 +482,12 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
         <div className="space-y-6 lg:col-span-1">
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Overview</h3>
-            <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+            {/* <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><FileText className="w-4 h-4 mr-2"/> Column Analyzed</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-800 px-2 py-1 rounded text-xs">{columnAnalyzed}</span>
-            </div>
+            </div> */}
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
-              <span className="text-slate-500 dark:text-slate-400 flex items-center"><FileText className="w-4 h-4 mr-2"/> Total Comments</span>
+              <span className="text-slate-500 dark:text-slate-400 flex items-center"><FileText className="w-4 h-4 mr-2"/> Total Comments Analyzed (Text Only)</span>
               <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.total}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -477,15 +496,15 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><Target className="w-4 h-4 mr-2"/> Brand Sentiment</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{brandSentiment.toFixed(1)}%</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{Math.round(brandSentiment)}%</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><Activity className="w-4 h-4 mr-2"/> Net Sentiment Score</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{netSentimentScore.toFixed(1)}</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{Math.round(netSentimentScore)}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><BarChart2 className="w-4 h-4 mr-2"/> Avg Engagement</span>
-              <span className="font-semibold text-slate-800 dark:text-slate-200">{stats.averageEngagement.toFixed(1)}</span>
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{Math.round(stats.averageEngagement.toFixed(1))}</span>
             </div>
             <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
               <span className="text-slate-500 dark:text-slate-400 flex items-center"><BarChart2 className="w-4 h-4 mr-2"/> Total Engagement</span>
@@ -532,11 +551,17 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="mt-4 flex justify-around text-sm text-slate-500 dark:text-slate-400">
-              <span>Pos: {stats.total > 0 ? ((stats.positive / stats.total) * 100).toFixed(1) : 0}%</span>
-              <span>Neg: {stats.total > 0 ? ((stats.negative / stats.total) * 100).toFixed(1) : 0}%</span>
-              <span>Neu: {stats.total > 0 ? ((stats.neutral / stats.total) * 100).toFixed(1) : 0}%</span>
-            </div>
+<div className="mt-4 flex justify-around text-sm text-slate-500 dark:text-slate-400">
+  <span>
+    Pos: {stats.total > 0 ? Math.round((stats.positive / stats.total) * 100) : 0}%
+  </span>
+  <span>
+    Neg: {stats.total > 0 ? Math.round((stats.negative / stats.total) * 100) : 0}%
+  </span>
+  <span>
+    Neu: {stats.total > 0 ? Math.round((stats.neutral / stats.total) * 100) : 0}%
+  </span>
+</div>
           </div>
           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 text-center">Positive vs Negative</h3>
@@ -556,8 +581,8 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
               </ResponsiveContainer>
             </div>
             <div className="mt-4 flex justify-around text-sm text-slate-500 dark:text-slate-400">
-              <span>Pos: {posNegTotal > 0 ? ((stats.positive / posNegTotal) * 100).toFixed(1) : 0}%</span>
-              <span>Neg: {posNegTotal > 0 ? ((stats.negative / posNegTotal) * 100).toFixed(1) : 0}%</span>
+              <span>Pos: {posNegTotal > 0 ? Math.round((stats.positive / posNegTotal) * 100) : 0}%</span>
+              <span>Neg: {posNegTotal > 0 ? Math.round((stats.negative / posNegTotal) * 100) : 0}%</span>
             </div>
           </div>
 
@@ -592,9 +617,16 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
                     </ResponsiveContainer>
                   </div>
                   <div className="mt-4 flex justify-around text-sm text-slate-500 dark:text-slate-400">
-                    <span>Pos: {(stats.verifiedPositive + stats.verifiedNegative) > 0 ? ((stats.verifiedPositive / (stats.verifiedPositive + stats.verifiedNegative)) * 100).toFixed(1) : 0}%</span>
-                    <span>Neg: {(stats.verifiedPositive + stats.verifiedNegative) > 0 ? ((stats.verifiedNegative / (stats.verifiedPositive + stats.verifiedNegative)) * 100).toFixed(1) : 0}%</span>
-                  </div>
+  <span>
+    Pos: {(stats.verifiedPositive + stats.verifiedNegative) > 0
+      ? Math.round((stats.verifiedPositive / (stats.verifiedPositive + stats.verifiedNegative)) * 100)
+      : 0}%
+  </span>
+  <span>
+    Neg: {(stats.verifiedPositive + stats.verifiedNegative) > 0
+      ? Math.round((stats.verifiedNegative / (stats.verifiedPositive + stats.verifiedNegative)) * 100)
+      : 0}%
+  </span>                  </div>
                 </div>
               )}
             </div>
@@ -613,15 +645,43 @@ export function FinalResults({ stats, columnAnalyzed, processedComments, onCompa
                />
             </div>
           </div>
-
           <CompetitorSentimentChart 
             brands={[
               {
-                name: "Main Brand",
+                name: brandName,
+                displayName: isEditingBrand ? (
+                  <input 
+                    autoFocus
+                    className="bg-slate-100 dark:bg-slate-700 border-none rounded px-2 py-0.5 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none w-32"
+                    value={editingBrandValue}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditingBrandValue(e.target.value)}
+                    onBlur={() => {
+                      if (editingBrandValue.trim() && onBrandNameUpdate) {
+                        onBrandNameUpdate(editingBrandValue.trim());
+                      }
+                      setIsEditingBrand(false);
+                    }}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                      if (e.key === 'Enter') {
+                        if (editingBrandValue.trim() && onBrandNameUpdate) {
+                          onBrandNameUpdate(editingBrandValue.trim());
+                        }
+                        setIsEditingBrand(false);
+                      } else if (e.key === 'Escape') {
+                        setEditingBrandValue(brandName);
+                        setIsEditingBrand(false);
+                      }
+                    }}
+                  />
+                ) : (
+                  <span onDoubleClick={() => setIsEditingBrand(true)} className="cursor-pointer hover:text-indigo-600 transition-colors">
+                    {brandName}
+                  </span>
+                ),
                 positive: stats.positive,
                 negative: stats.negative,
                 neutral: stats.neutral,
-                color: "#6366f1"
+                color: '#6366f1'
               }
             ]} 
           />

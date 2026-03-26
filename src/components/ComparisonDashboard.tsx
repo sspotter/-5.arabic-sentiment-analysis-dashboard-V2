@@ -80,6 +80,7 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
   
   const getBrandName = (brand: ExportedAnalysis, index: number) => {
     if (customBrandNames[index]) return customBrandNames[index];
+    if (brand.metadata.brandName) return brand.metadata.brandName;
     if (index === 0) return "Main Brand";
     const colName = brand.metadata.columnAnalyzed || 'Unknown';
     return `Brand ${index} (${colName})`;
@@ -597,7 +598,7 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
                 <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Timeframe:</label>
                 <select 
                   value={timeframe} 
-                  onChange={(e) => setTimeframe(e.target.value as any)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTimeframe(e.target.value as any)}
                   className="block w-32 pl-3 pr-10 py-1.5 text-sm border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg border bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm"
                 >
                   <option value="daily">Daily</option>
@@ -609,7 +610,7 @@ export function ComparisonDashboard({ currentBrand, comparedBrands, onClose, onA
                 <label className="text-sm font-medium text-slate-600 dark:text-slate-400">Mode:</label>
                 <select 
                   value={comparisonMode} 
-                  onChange={(e) => setComparisonMode(e.target.value as any)}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setComparisonMode(e.target.value as any)}
                   className="block w-32 pl-3 pr-10 py-1.5 text-sm border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-lg border bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-sm"
                 >
                   <option value="absolute">Absolute</option>

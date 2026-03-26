@@ -11,6 +11,8 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Folder, Moon, Sun, CheckCircle, X } from 'lucide-react';
 import { defaultProjects } from './data/defaultProjects';
+import { TrendTestPage } from './components/TrendTestPage';
+import { BarChart3 } from 'lucide-react';
 
 
 // Default projects for demonstration (sourced from data file)
@@ -62,6 +64,7 @@ export default function App() {
   });
   const [processedComments, setProcessedComments] = useState<CommentData[]>([]);
   const [columnAnalyzed, setColumnAnalyzed] = useState<string>('');
+  const [brandName, setBrandName] = useState<string>('Main Brand');
   const [comparisonData, setComparisonData] = useState<ExportedAnalysis[]>([]);
   const [isComparing, setIsComparing] = useState(false);
   const [savedProjects, setSavedProjects] = useState<SavedProject[]>(() => {
@@ -86,6 +89,7 @@ export default function App() {
     }
   });
   const [showSavedProjects, setShowSavedProjects] = useState(false);
+  const [showTrendTest, setShowTrendTest] = useState(false);
   const [autoDownload, setAutoDownload] = useState(true);
 
   const handleFileUpload = (uploadedFile: File) => {
@@ -133,6 +137,7 @@ export default function App() {
           if (json.type === 'comparison' && json.brands && json.brands.length > 0) {
             const mainBrand = json.brands[0];
             setColumnAnalyzed(mainBrand.metadata.columnAnalyzed);
+            setBrandName(mainBrand.metadata.brandName || "Main Brand");
             setStats(mainBrand.stats);
             setProcessedComments(mainBrand.comments);
             setComparisonData(json.brands.slice(1));
@@ -146,6 +151,7 @@ export default function App() {
           if (json.metadata && json.stats && json.comments) {
             // It's an exported analysis
             setColumnAnalyzed(json.metadata.columnAnalyzed);
+            setBrandName(json.metadata.brandName || "Main Brand");
             setStats(json.stats);
             setProcessedComments(json.comments);
             setIsFinished(true);
@@ -247,6 +253,7 @@ export default function App() {
     setIsFinished(false);
     setProcessedComments([]);
     setColumnAnalyzed('');
+    setBrandName('Main Brand');
     setComparisonData([]);
     setIsComparing(false);
     setStats({
@@ -272,6 +279,7 @@ export default function App() {
     setIsMergingState(isMerging);
     if (!isMerging) {
       setColumnAnalyzed(column);
+      setBrandName(column);
     }
     setIsAnalyzing(true);
     setIsFinished(false);
@@ -414,6 +422,7 @@ export default function App() {
       const exportData: ExportedAnalysis = {
           metadata: {
           columnAnalyzed: isMerging ? columnAnalyzed : column,
+          brandName: isMerging ? brandName : column,
           evaluationTime: currentStats.endTime ? (currentStats.endTime - currentStats.startTime) / 1000 : 0,
           processingSpeed: currentStats.endTime ? (currentStats.total / ((currentStats.endTime - currentStats.startTime) / 1000)).toFixed(1) : 0,
           timestamp: new Date().toISOString()
@@ -480,6 +489,7 @@ export default function App() {
   const loadSavedProject = (project: SavedProject) => {
     const json = project.data;
     setColumnAnalyzed(json.metadata.columnAnalyzed);
+    setBrandName(json.metadata.brandName || "Main Brand");
     setStats(json.stats);
     setProcessedComments(json.comments);
     setIsFinished(true);
@@ -493,6 +503,7 @@ export default function App() {
   const currentExportedData: ExportedAnalysis = {
     metadata: {
       columnAnalyzed,
+      brandName,
       evaluationTime: stats.endTime ? (stats.endTime - stats.startTime) / 1000 : 0,
       processingSpeed: stats.endTime ? (stats.total / ((stats.endTime - stats.startTime) / 1000)).toFixed(1) : 0,
       timestamp: new Date().toISOString()
@@ -528,8 +539,21 @@ export default function App() {
                 Start Over
               </button>
             )}
+            {/* <button
+              onClick={() => {
+                setShowTrendTest(true);
+                setShowSavedProjects(false);
+              }}
+              className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-emerald-400 transition-colors flex items-center"
+            >
+              <BarChart3 className="w-4 h-4 mr-1" />
+              Trend Test
+            </button> */}
             <button
-              onClick={() => setShowSavedProjects(true)}
+              onClick={() => {
+                setShowSavedProjects(true);
+                setShowTrendTest(false);
+              }}
               className="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-purple-400 transition-colors flex items-center"
             >
               <Folder className="w-4 h-4 mr-1" />
@@ -557,6 +581,8 @@ export default function App() {
             onDelete={handleDeleteProject}
             onClose={() => setShowSavedProjects(false)}
           />
+        ) : showTrendTest ? (
+          <TrendTestPage onBack={() => setShowTrendTest(false)} />
         ) : (
           <>
             {/* Intro Section */}
@@ -620,6 +646,8 @@ export default function App() {
               <FinalResults 
                 stats={stats} 
                 columnAnalyzed={columnAnalyzed} 
+                brandName={brandName}
+                onBrandNameUpdate={setBrandName}
                 processedComments={processedComments} 
                 onCompare={handleCompare}
                 onReset={handleReset}

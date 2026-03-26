@@ -31,6 +31,7 @@ export interface AnalysisStats {
 export interface ExportedAnalysis {
   metadata: {
     columnAnalyzed: string;
+    brandName?: string;
     evaluationTime: number;
     processingSpeed: string | number;
     timestamp: string;
